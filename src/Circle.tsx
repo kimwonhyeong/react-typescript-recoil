@@ -1,5 +1,5 @@
 import styled from "styled-components";
-
+import {useState} from "react";
 
 interface ContainerProps {
 	bgColor: string;
@@ -17,17 +17,14 @@ const Container = styled.div<ContainerProps>`
 interface CircleProps {
 	bgColor: string;
 	borderColor?: string;
+	text?: string;
 }
 
-function Circle({bgColor, borderColor}:CircleProps){
-	return <Container bgColor={bgColor} borderColor={borderColor ?? bgColor}/>;
+function Circle({bgColor, borderColor, text = "default text"}:CircleProps){
+	const [counter,setCounter]=useState<number|string>(0);//왠만해서는 잘 안 씀. 한 번 타입이 지정된 state는 계속 유지하기 때문이다.
+	setCounter(2);
+	setCounter("h");
+	return <Container bgColor={bgColor} borderColor={borderColor ?? bgColor}>{text}</Container>;
 }
 
 export default Circle;
-
-interface PlayerShape {
-	name:string;
-	age:number;
-}
-const sayHello = (playerObj:PlayerShape) => console.log(`Hello ${playerObj.name} you are ${playerObj.age} years old.`);
-sayHello({name:"nico", age:12});
