@@ -2,11 +2,11 @@ import React from "react";
 import ReactDOM from "react-dom";
 import {ThemeProvider} from "styled-components";
 import App from "./App";
-import {darkTheme,lightTheme} from "./theme";
+import {Theme} from "./theme";
 
 ReactDOM.render(
   <React.StrictMode>
-	<ThemeProvider theme={darkTheme}>
+	<ThemeProvider theme={Theme}>
 		<App />
 	</ThemeProvider>
   </React.StrictMode>,
