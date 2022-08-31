@@ -66,7 +66,7 @@ function Coins(){
 	const [loading, setLoading] = useState(true);
 	useEffect(()=>{
 		console.log(3);
-		(async()=>{
+		(async ()=>{
 			console.log(4);
 			const response = await fetch("https://api.coinpaprika.com/v1/coins");
 			console.log(5);
