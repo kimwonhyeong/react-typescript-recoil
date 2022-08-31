@@ -3,6 +3,9 @@ import styled from "styled-components";
 import {useState, useEffect} from 'react';
 import Chart from "./Chart";
 import Price from "./Price";
+import {useQuery} from "react-query";
+import {fetchCoinInfo, fetchCoinTickers} from "../api";
+
 const Container = styled.div`
 	padding: 0px 20px;
 	max-width: 480px;
@@ -35,6 +38,7 @@ const OverviewItem = styled.div`
 	display:flex;
 	flex-direction: column;
 	align-items: center;
+	width:33%;
 	span:first-child {
 		font-size: 10px;
 		font-weight: 400;
@@ -127,14 +131,17 @@ interface PriceData{// temp1 temp2로 바꾸고, Object.keys(temp1).join(); Obje
 	};
 }
 function Coin(){
-	const [loading, setLoading] = useState(true);
 	const { coinId } = useParams<Params>(); //구조 분해 할당 문법
+	const {isLoading: infoLoading, data: infoData} = useQuery<InfoData>(["info",coinId], ()=>fetchCoinInfo(coinId));
+	const {isLoading: tickersLoading, data: tickersData} = useQuery<PriceData>(["tickers",coinId], ()=>fetchCoinTickers(coinId));
+	//const [loading, setLoading] = useState(true);
 	const {state} = useLocation<RouteState>();
-	const [info, setInfo] = useState<InfoData>();
-	const [priceInfo, setPriceInfo] = useState<PriceData>();
+	//const [info, setInfo] = useState<InfoData>();
+	//const [priceInfo, setPriceInfo] = useState<PriceData>();
 	const priceMatch = useRouteMatch("/:coinId/price");
 	const chartMatch = useRouteMatch("/:coinId/chart");
-	useEffect(()=>{
+	const loading = infoLoading || tickersLoading;
+	/*useEffect(()=>{
 		(async()=>{
 			const infoData = await (await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)).json();
 			const priceData = await (await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)).json();
@@ -143,40 +150,40 @@ function Coin(){
 			setLoading(false);
 		})();
 		
-	},[coinId]);
+	},[coinId]);*/
 	//위 문장이 제너럴의 활용이다. 입력값과 출력값의 타입을 any라 설정했다해도 입력값과 출력값이 같은지 검사할 수 있다.
 	//항상 존재하지 않을 수도 있기 때문에 ?사용
 	//title 부분에 왼쪽에서 두 개가 메인 홈페이지 거쳐서 들어온 경우 / 나머지 오른쪽이 링크 직접쳐서 들어온 경우
 	return (
 		<Container>
 			<Header>
-				<Title>{ state?.name ? state.name : loading ? "Loading..." : info?.name}</Title>
+				<Title>{ state?.name ? state.name : loading ? "Loading..." : infoData?.name}</Title>
 			</Header>
 			{loading ? <Loader>Loading...</Loader>: (
 				<>
 					<Overview>
 						<OverviewItem>
 							<span>Rank:</span>
-							<span>{info?.rank}</span>
+							<span>{infoData?.rank}</span>
 						</OverviewItem>
 						<OverviewItem>
 							<span>Symbol:</span>
-							<span>{info?.symbol}</span>
+							<span>{infoData?.symbol}</span>
 						</OverviewItem>
 						<OverviewItem>
 							<span>Open Source:</span>
-							<span>{info?.open_source}</span>
+							<span>{infoData?.open_source}</span>
 						</OverviewItem>
 					</Overview>
-					<Description>{info?.description}</Description>
+					<Description>{infoData?.description}</Description>
 					<Overview>
 						<OverviewItem>
 							<span>Total Suply:</span>
-							<span>{priceInfo?.total_supply}</span>
+							<span>{tickersData?.total_supply}</span>
 						</OverviewItem>
 						<OverviewItem>
 							<span>Max Supply:</span>
-							<span>{priceInfo?.max_supply}</span>
+							<span>{tickersData?.max_supply}</span>
 						</OverviewItem>
 					</Overview>
 					<Tabs>

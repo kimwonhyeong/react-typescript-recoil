@@ -1,7 +1,8 @@
 import styled from "styled-components";
 import {Link} from "react-router-dom";
 import {useState, useEffect} from "react";
-
+import {useQuery} from "react-query";
+import {fetchCoins} from "../api";
 //styled-components
 const Container = styled.div`
 	padding: 0px 20px;
@@ -50,7 +51,7 @@ const Img = styled.img`
 	margin-right:10px;
 `;
 //인터페이스
-interface CoinInterface{
+interface ICoin{
 	id: string;
 	name: string;
 	symbol: string;
@@ -62,6 +63,8 @@ interface CoinInterface{
 
 //메인 함수
 function Coins(){
+	const {isLoading, data } = useQuery<ICoin[]>("allCoins", fetchCoins);
+	/*
 	const [coins, setCoins] = useState<CoinInterface[]>([]);
 	const [loading, setLoading] = useState(true);
 	useEffect(()=>{
@@ -77,14 +80,14 @@ function Coins(){
 		console.log(loading);
 	},[])
 	console.log(coins);
-	console.log(loading);
+	console.log(loading);*/
 	return (
 		<Container>
 			<Header>
 				<Title>코인</Title>
 			</Header>
-			{loading ? <Loader>Loading...</Loader> :<CoinsList>
-				{coins.map((coin)=>(
+			{isLoading ? <Loader>Loading...</Loader> :<CoinsList>
+				{data?.slice(0,100).map((coin)=>(
 					<Coin key={coin.id}>
 						<Link
 							to={{
