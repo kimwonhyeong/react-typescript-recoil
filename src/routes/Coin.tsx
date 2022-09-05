@@ -1,6 +1,7 @@
 import {useLocation,Route,useParams,Switch, Link, useRouteMatch} from "react-router-dom";
 import styled from "styled-components";
 import {useState, useEffect} from 'react';
+import {Helmet} from "react-helmet";
 import Chart from "./Chart";
 import Price from "./Price";
 import {useQuery} from "react-query";
@@ -133,7 +134,9 @@ interface PriceData{// temp1 temp2로 바꾸고, Object.keys(temp1).join(); Obje
 function Coin(){
 	const { coinId } = useParams<Params>(); //구조 분해 할당 문법
 	const {isLoading: infoLoading, data: infoData} = useQuery<InfoData>(["info",coinId], ()=>fetchCoinInfo(coinId));
-	const {isLoading: tickersLoading, data: tickersData} = useQuery<PriceData>(["tickers",coinId], ()=>fetchCoinTickers(coinId));
+	const {isLoading: tickersLoading, data: tickersData} = useQuery<PriceData>(["tickers",coinId], ()=>fetchCoinTickers(coinId),{
+		refetchInterval:5000,
+	});
 	//const [loading, setLoading] = useState(true);
 	const {state} = useLocation<RouteState>();
 	//const [info, setInfo] = useState<InfoData>();
@@ -149,13 +152,15 @@ function Coin(){
 			setPriceInfo(priceData);
 			setLoading(false);
 		})();
-		
 	},[coinId]);*/
 	//위 문장이 제너럴의 활용이다. 입력값과 출력값의 타입을 any라 설정했다해도 입력값과 출력값이 같은지 검사할 수 있다.
 	//항상 존재하지 않을 수도 있기 때문에 ?사용
 	//title 부분에 왼쪽에서 두 개가 메인 홈페이지 거쳐서 들어온 경우 / 나머지 오른쪽이 링크 직접쳐서 들어온 경우
 	return (
 		<Container>
+			<Helmet>
+				<title>{ state?.name ? state.name : loading ? "Loading..." : infoData?.name}</title>
+			</Helmet>
 			<Header>
 				<Title>{ state?.name ? state.name : loading ? "Loading..." : infoData?.name}</Title>
 			</Header>
@@ -171,8 +176,8 @@ function Coin(){
 							<span>{infoData?.symbol}</span>
 						</OverviewItem>
 						<OverviewItem>
-							<span>Open Source:</span>
-							<span>{infoData?.open_source}</span>
+							<span>Price:</span>
+							<span>{tickersData?.quotes.USD.price}</span>
 						</OverviewItem>
 					</Overview>
 					<Description>{infoData?.description}</Description>
@@ -195,7 +200,7 @@ function Coin(){
 							<Price/>
 						</Route>
 						<Route path={`/:coinId/chart`}>
-							<Chart/>
+							<Chart coinId={coinId}/>
 						</Route>
 					</Switch>
 				</>

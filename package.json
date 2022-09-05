@@ -10,8 +10,11 @@
     "@types/node": "^16.11.49",
     "@types/react": "^17.0.30",
     "@types/react-dom": "^17.0.9",
+    "apexcharts": "^3.35.5",
     "react": "^17.0.2",
+    "react-apexcharts": "^1.4.0",
     "react-dom": "^17.0.2",
+    "react-helmet": "^6.1.0",
     "react-query": "^3.27.0",
     "react-router-dom": "^5.3.0",
     "react-scripts": "5.0.1",
@@ -44,6 +47,7 @@
     ]
   },
   "devDependencies": {
+    "@types/react-helmet": "^6.1.5",
     "@types/react-query": "^1.2.9",
     "@types/react-router-dom": "^5.3.3",
     "@types/styled-components": "^5.1.26"
