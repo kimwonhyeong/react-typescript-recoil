@@ -1,9 +1,10 @@
 import styled from "styled-components";
 import {Link} from "react-router-dom";
-import {useState, useEffect} from "react";
 import {useQuery} from "react-query";
 import {fetchCoins} from "../api";
 import {Helmet} from "react-helmet";
+import {isDarkAtom} from "../atom";
+import {useSetRecoilState} from "recoil";
 //styled-components
 const Container = styled.div`
 	padding: 0px 20px;
@@ -19,8 +20,8 @@ const Header = styled.header`
 const CoinsList = styled.ul``;
 const Coin = styled.li`
 	display:flex;
-	background-color: white;
-	color: ${props => props.theme.bgColor};
+	background-color: ${props=>props.theme.coinBgColor};
+	color: ${props => props.theme.textColor};
 	padding: 10px;
 	height:70px;
 	margin-bottom: 10px;
@@ -61,10 +62,11 @@ interface ICoin{
 	is_active: boolean;
 	type: string;
 }
-
 //메인 함수
 function Coins(){
-	const {isLoading, data } = useQuery<ICoin[]>("allCoins", fetchCoins);
+	const setDarkAtom = useSetRecoilState(isDarkAtom);
+	const toggleDarkAtom = ()=>{setDarkAtom((a)=>!a)};
+	const {isLoading, data} = useQuery<ICoin[]>("allCoins", fetchCoins);
 	/*
 	const [coins, setCoins] = useState<CoinInterface[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -89,6 +91,7 @@ function Coins(){
 			</Helmet>
 			<Header>
 				<Title>코인</Title>
+				<button onClick={toggleDarkAtom}>Toggle Mode</button>
 			</Header>
 			{isLoading ? <Loader>Loading...</Loader> :<CoinsList>
 				{data?.slice(0,100).map((coin)=>(
