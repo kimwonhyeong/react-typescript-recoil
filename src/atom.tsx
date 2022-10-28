@@ -20,9 +20,7 @@ export const toDoSelector = selector({
  	key: "toDoSelector",
  	get: ({get})=>{ //{}는 객체다. 그리고 그 안에 get function이 들어있다.
  		const toDos = get(toDoState);
- 		return [toDos.filter((toDo: IToDo)=>toDo.category === "DOING"),
- 				toDos.filter((toDo: IToDo)=>toDo.category === "TO_DO"),
- 			    toDos.filter((toDo: IToDo)=>toDo.category === "DONE"),
- 			   ];
+		const category = get(categoryState);
+ 		return toDos.filter((toDo: IToDo)=>toDo.category === category);
  	},
  });
