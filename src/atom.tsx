@@ -1,32 +1,21 @@
 import {atom, selector} from "recoil";
 
-export enum Categories {
-	"TO_DO",
-	"DOING",
-	"DONE",
-}
-
-export interface IToDo {
-	text: string,
-	id: number,
-	category: Categories,
-}
-
-export const toDoState = atom<IToDo[]>({
-	key: "toDo",
-	default: [],
+export const minuteState = atom({
+	key:"minutes",
+	default:0,
 });
 
-export const categoryState = atom<Categories>({
-	key: "category",
-	default: Categories.TO_DO,
+export const hourSelector = selector<number>({
+	key:"hours",
+	get: ({ get }) => {
+		const minutes = get(minuteState);
+		return minutes / 60;
+	},
+	set: ({set}, newValue) => { //newValue는 selector의 값
+		const minutes = Number(newValue) * 60;
+		set(minuteState, minutes);
+	},
 });
 
-export const toDoSelector = selector({
- 	key: "toDoSelector",
- 	get: ({get})=>{ //{}는 객체다. 그리고 그 안에 get function이 들어있다.
- 		const toDos = get(toDoState);
-		const category = get(categoryState);
- 		return toDos.filter((toDo: IToDo)=>toDo.category === category);
- 	},
- });
+//결국 set은 atom의 값을 수정한다.
+//selector는 두 개의 atom을 지지고 볶고도 가능하다
