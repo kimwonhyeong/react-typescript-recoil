@@ -1,21 +1,30 @@
-import {useRecoilState, useRecoilValue} from "recoil";
-import {minuteState, hourSelector} from "./atom";
+import { motion } from "framer-motion";
+import styled from "styled-components";
+
+const Wrapper = styled.div`
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Box = styled(motion.div)`
+  width: 200px;
+  height: 200px;
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
+`;
+
 function App(){
-	const [minute, setMinute] = useRecoilState(minuteState);
-	const [hours, setHours] = useRecoilState(hourSelector);
-	
-	const onMChange = (e:React.FormEvent<HTMLInputElement>)=>{
-		setMinute(+e.currentTarget.value);
-	};
-	const onHChange = (e:React.FormEvent<HTMLInputElement>)=>{
-		setHours(+e.currentTarget.value);
-	};
-	
 	return (
-		<div>
-			<input value={minute} onChange={onMChange} type="number" placeholder="Minutes"/>
-			<input value={hours} onChange={onHChange} type="number" placeholder="Hours"/>
-		</div>
+		<Wrapper>
+			<Box
+				transition={{type:'spring', repeat: Infinity, mass:4, delay:0.5}}
+				initial={{scale:2}}
+				animate={{ scale:1, rotateZ: 360 }}/>
+		</Wrapper>
 	);
 	
 }
