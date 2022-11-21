@@ -1,36 +1,60 @@
-import { motion, useMotionValue, useTransform, useScroll} from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useTransform, useScroll} from "framer-motion";
 import styled from "styled-components";
-import {useRef, useEffect} from "react";
+import {useRef, useEffect, useState} from "react";
 
 //css 기록할 것. 배경은 vh vw를 사용한다.
+//map을 쓸 때 react에서는 반드시 키를 준다는 거.
+// flex-direction
+//relative 없을 때 absolute => https://creamilk88.tistory.com/197 position에 대한 좋은 정의가 있다.
 const Wrapper = styled(motion.div)`
   height: 300vh;
   width: 100vw;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 `;
 
-const Svg = styled.svg`
+const Box = styled(motion.div)`
 	width:300px;
-	height:300px;
+	height:200px;
+	background: white;
+	display:flex;
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	top:700px;
+	font-size:30px;
 `;
 
 const myVars ={
 	start: {
-		fill:"rgba(255,255,255,0)",
-		pathLength:0
+		opacity:0,
+		scale:0,
+		x: 600,
 	},
 	end: {
-		fill:"rgba(255,255,255,1)",
-		pathLength:1,
+		opacity:1,
+		scale:1,
+		x:0,
 		transition:{
-			default:{duration:5}, //기본적으로는 5초 동안
-			fill: {duration:3,delay:1}, //fill 속성만 5초 후 2초 동안
+			duration: 1,
 		}
 	},
+	exit: {
+		x: -600,
+		opacity:0,
+		scale:0,
+		transition:{
+			duration: 1,
+		}
+	}
 }
 function App(){
+	const [magic, setMasic] = useState(1);
+	const number = ()=>{
+		magic === 10 ? setMasic(1) : setMasic(1+magic);
+	};
 	const x = useMotionValue(0);
 	const gradient = useTransform(
 		x,
@@ -38,19 +62,20 @@ function App(){
 		["linear-gradient(135deg,rgb(0, 210, 238), rgb(0, 83, 238))",
 		 "linear-gradient(135deg,rgb(0, 238, 155), rgb(238, 178, 0))"]
 	);
+
+
 	return (
 		<Wrapper style={{background: gradient}}>
-			<Svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-				<motion.path 
-					variants={myVars}
+			<AnimatePresence>
+				{[1,2,3,4,5,6,7,8,9,10].map((i)=> i===magic ? <Box key={i} variants={myVars}
 					initial="start"
 					animate="end"
-					stroke="white"
-					strokeWidth="2"
-					d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"
-				/>
-			</Svg>
+					exit="exit">{i}</Box> : null)}
+			</AnimatePresence>
+			<button onClick={number}>Click!</button>
 		</Wrapper>
 	);
 }
+//AnimatePresence는 항상 눈에 보여야 하기 때문에 {show ? :} 안에 있으면 안 된다.
+
 export default App;
