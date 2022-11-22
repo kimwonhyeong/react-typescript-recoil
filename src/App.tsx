@@ -3,7 +3,7 @@ import styled from "styled-components";
 import {useRef, useEffect, useState} from "react";
 
 //css 기록할 것. 배경은 vh vw를 사용한다.
-//map을 쓸 때 react에서는 반드시 키를 준다는 거.
+//map을 쓸 때 react에서는 반드시 키를 준다는 거.(key를 보고 각각의 것들이 고유하다고 생각하니) key를 바꾸면 react는 component를 re-render해준다.key가 바뀌면서 기존것은 없어졌다고 생각한다.    를 ㄱ
 // flex-direction
 //relative 없을 때 absolute => https://creamilk88.tistory.com/197 position에 대한 좋은 정의가 있다.
 const Wrapper = styled(motion.div)`
@@ -28,12 +28,12 @@ const Box = styled(motion.div)`
 `;
 
 const myVars ={
-	start: {
+	entry: (isback:boolean)=>({
 		opacity:0,
 		scale:0,
-		x: 600,
-	},
-	end: {
+		x: isback ? -600 : 600,
+	}),
+	center: {
 		opacity:1,
 		scale:1,
 		x:0,
@@ -41,19 +41,24 @@ const myVars ={
 			duration: 1,
 		}
 	},
-	exit: {
-		x: -600,
+	exit: (isback:boolean)=>({
+		x: isback ? 600 : -600,
 		opacity:0,
 		scale:0,
 		transition:{
 			duration: 1,
 		}
-	}
+	})
 }
 function App(){
-	const [magic, setMasic] = useState(1);
+	const [magic, setMagic] = useState(1);
+	const [back, setBack] = useState(false);
 	const number = ()=>{
-		magic === 10 ? setMasic(1) : setMasic(1+magic);
+		magic === 10 ? setMagic(1) : setMagic(1+magic);
+	};
+	const unnumber = ()=>{
+		setBack(true);
+		magic === 1 ? setMagic(10) : setMagic(magic-1);
 	};
 	const x = useMotionValue(0);
 	const gradient = useTransform(
@@ -66,13 +71,15 @@ function App(){
 
 	return (
 		<Wrapper style={{background: gradient}}>
-			<AnimatePresence>
-				{[1,2,3,4,5,6,7,8,9,10].map((i)=> i===magic ? <Box key={i} variants={myVars}
-					initial="start"
-					animate="end"
-					exit="exit">{i}</Box> : null)}
+			<AnimatePresence custom={back}>
+				<Box key={magic} variants={myVars}
+					custom={back}
+					initial="entry"
+					animate="center"
+					exit="exit">{magic}</Box>
 			</AnimatePresence>
 			<button onClick={number}>Click!</button>
+			<button onClick={unnumber}>Click!</button>
 		</Wrapper>
 	);
 }
