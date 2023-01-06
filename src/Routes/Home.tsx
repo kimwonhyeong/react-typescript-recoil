@@ -10,6 +10,7 @@ import {makeImagePath} from "../utils";
 import {areaMovie, videoKey} from "../atom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {Play} from "../Components/DetailView";
+import Header from "../Components/Header";
 
 const Wrapper = styled.div`
 	background: black;
@@ -84,13 +85,12 @@ const DetailBox = styled(motion.div)`
 function Home() {
 	const detailMovieHistory = useHistory();
 	const detailMatch = useRouteMatch<{movieId: string}>("/movie/:movieId");
-	const {data: movie, isLoading:movieLoading} = useQuery<IGetMoviesResult>("moviesD", getMovies);
-	const {data: gradeMovie, isLoading:gradeLoading} = useQuery<IGetMoviesResult>("gradeMovieD", bestGrade);
-	const {data: popularMovie, isLoading:popularLoading} = useQuery<IPopular>("popularMovieD", popular);
+	const {data: movie, isLoading:movieLoading} = useQuery<IGetMoviesResult>("moviesD",()=>getMovies("movie"));
+	const {data: gradeMovie, isLoading:gradeLoading} = useQuery<IGetMoviesResult>("gradeMovieD", ()=>bestGrade("movie"));
+	const {data: popularMovie, isLoading:popularLoading} = useQuery<IPopular>("popularMovieD", ()=>popular("movie"));
 	const [area, setArea] = useRecoilState(areaMovie);
 	const videoKeys = useRecoilValue(videoKey);
-	console.log(videoKeys.length);
-	console.log(videoKeys);
+	console.log(detailMatch);
 	//let i:number = 0;
 	// const videoFunc = (i: number)=>{
 	// 	const {data: video} = useQuery<IGetVideo>("videoD",getVideo(movie?.results[i].id) || "");	
@@ -102,11 +102,12 @@ function Home() {
 		detailMovieHistory.push("/");
 	};
 	const playMainMovie = ()=>{
-		detailMovieHistory.push(`/movie/${gradeMovie?.results[6].id}`);
+		detailMovieHistory.push(`/movie/${gradeMovie?.results[7].id}`);
 	};
 	
 	return (
 		<>
+			{detailMatch?.isExact ? null : <Header/>}
 			<Wrapper>
 				{movieLoading ? <Loader>Loading...</Loader> :
 				<>
@@ -126,10 +127,10 @@ function Home() {
 					 <Slider movie={popularMovie?.results} id="popularMovie"/>
 				 </SliderWrapper>
 				 <AnimatePresence>
-					{detailMatch ? 
+					{detailMatch?.isExact ? 
 						 <>
 							<Overlay onClick={overlayClick} animate={{background:"rgba(0,0,0,0.5)"}}/>
-							<DetailBox layoutId={`${detailMatch.params.movieId}${area}`}><DetailView id={detailMatch.params.movieId}/></DetailBox> 
+							<DetailBox layoutId={`${detailMatch?.params.movieId}${area}`}><DetailView id={detailMatch.params.movieId}/></DetailBox> 
 						 </>
 					: null}
 				 </AnimatePresence>

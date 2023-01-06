@@ -110,18 +110,19 @@ const rowVars = {
 const offset = 6;
 
 type sliderProps = {
-  movie?: IPopularResult[] | IBestGradeResult[] | IMovie[];
+  tv?: IGetTvResult[];
   id?: string;
 };
 
-function Slider({movie,id}:sliderProps){
+
+function SliderTv({tv,id}:sliderProps){
 	const [area, setArea] = useRecoilState(areaMovie);
 	const areaClassification = ()=>{
 		setArea(id+"");
 	}
 	const detailMovieHistory = useHistory();
-	const detailMovieView = (channel:string,movieId:number)=>{
-		detailMovieHistory.push(`/${channel}/${movieId}`);
+	const detailMovieView = (channel:string,tvId:number)=>{
+		detailMovieHistory.push(`/${channel}/${tvId}`);
 	};
 	const [index, setIndex] = useState(0);
 	const [leaving, setLeaving] = useState(false);
@@ -130,7 +131,7 @@ function Slider({movie,id}:sliderProps){
 			if(leaving) return;
 			toggleLeaving();
 			setLeftRight(true);
-			const totalMovies = movie!.length-1;
+			const totalMovies = tv!.length-1;
 			const maxIndex = Math.ceil(totalMovies/offset)-1;
 			setIndex((prev)=>prev === maxIndex ? 0 : prev+1);
 	}
@@ -138,7 +139,7 @@ function Slider({movie,id}:sliderProps){
 			if(leaving) return;
 			toggleLeaving();
 			setLeftRight(false);
-			const totalMovies = movie!.length-1;
+			const totalMovies = tv!.length-1;
 			const maxIndex = Math.ceil(totalMovies/offset)-1;
 			setIndex((prev)=>prev === 0 ? maxIndex : prev-1);
 	}
@@ -147,7 +148,7 @@ function Slider({movie,id}:sliderProps){
 	};
 	const onClick = (id:number)=>{
 		areaClassification();
-		detailMovieView("movie",id);
+		detailMovieView("tv",id);
 	};
 	return(
 		<SliderWrapper>
@@ -166,18 +167,18 @@ function Slider({movie,id}:sliderProps){
 						transition={{type: "tween", duration: 1.5 }}
 						key={index}
 					>
-						{movie?.slice(1).slice(offset*index, offset*index+offset)
-							.map(movie=>
+						{tv?.slice(1).slice(offset*index, offset*index+offset)
+							.map(tv=>
 								<Box
-									key={movie.id}
-									layoutId={`${movie.id+""}${id}`}
+									key={tv.id}
+									layoutId={`${tv.id+""}${id}`}
 									variants={boxVariant}
 									initial="normal"
 									whileHover="hover"
 									transition={{ type: "tween"}}
-									bgPhoto={makeImagePath(movie?.poster_path)}
-									onClick={()=>onClick(movie.id)}>
-									<Info variants={infoVariant}><h4>{movie.title}</h4></Info>
+									bgPhoto={makeImagePath(tv?.poster_path)}
+									onClick={()=>onClick(tv.id)}>
+									<Info variants={infoVariant}><h4>{tv.name}</h4></Info>
 								</Box>
 								)}
 					</Row>
@@ -191,4 +192,4 @@ function Slider({movie,id}:sliderProps){
 	);	
 }
 
-export default Slider;
+export default SliderTv;

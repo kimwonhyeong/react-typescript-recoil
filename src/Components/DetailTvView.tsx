@@ -1,13 +1,12 @@
 import styled from "styled-components";
-import { createGlobalStyle } from "styled-components";
 import {useState, useEffect} from "react";
 import {makeImagePath} from "../utils";
 import {useHistory, useRouteMatch, useParams, useLocation} from "react-router-dom";
 import {motion, AnimatePresence} from "framer-motion";
 import {useQuery} from "react-query";
-import {getRecommend, IGetRecommend, getDetailMovie, IGetDetailMovie, getVideo, IGetVideo} from "../api";
+import {IGetTvRecommendResult,IgetTvDetail,IGetTvRecommend,getTvRecommend,getTvDetail,getTvVideo} from "../api";
 import PlayMedia from "../Routes/Play";
-import {videoKey} from "../atom";
+import {videoTvKey} from "../atom";
 import {useRecoilState} from "recoil";
 import {Link} from "react-router-dom";
 
@@ -23,7 +22,7 @@ const Content = styled(motion.div)`
 
 const Top = styled.div`
 	width: 100%;
-	height: 92%;
+	height: 90%;
 	background: black;
 	
 	position: relative;
@@ -42,7 +41,7 @@ const Info = styled.div`
 	
 	curser: default;
 	position: absolute;
-	top: 20%;
+	top: 25%;
 	left: 5%;
 `;
 
@@ -139,24 +138,17 @@ interface IProps{
 	id: string;
 }
 
-function DetailView({id}:IProps){
-	const {data:videoD} = useQuery<IGetVideo>(["videoD",id], ()=>getVideo("movie",parseFloat(id)));
-	const {data:detailMovieD} = useQuery<IGetDetailMovie>(["detailMovieD",id], ()=>getDetailMovie("movie",parseFloat(id)));
-	const {data:recommendD} = useQuery<IGetRecommend>(["recommendD",id],()=>getRecommend("movie",parseFloat(id)));
-	const [videoNum, setVideoNum] = useState(1);
-	const [videoKeys, setVideoKey] = useRecoilState<string>(videoKey);
+function DetailTvView({id}:IProps){
+	const {data:detailTvD} = useQuery<IgetTvDetail>(["detailMovieTvD",id], ()=>getTvDetail(parseFloat(id)));
+	const {data:recommendTvD} = useQuery<IGetTvRecommend>(["recommendTvD",id],()=>getTvRecommend(parseFloat(id)));
 	
-	const detailMovieHistory = useHistory();
-	const playMovie = () => {
-		setVideoKey(videoD?.results[0].key+"");
-	}
+	const history = useHistory();
 
-	const detailMovieView = (movie:string,id:number)=>{
-		detailMovieHistory.push(`/movie/${id}`);
+	const detailTvView = (movie:string,id:number)=>{
+		history.push(`/tv/${id}`);
 	}
-	const recommendClick = (media:string, id:number) =>{
-		detailMovieView(media,id);
-		setVideoKey("");
+	const recommendTvClick = (media:string, id:number) =>{
+		detailTvView(media,id);
 	}
 	const { pathname } = useLocation();
 	console.log(pathname);
@@ -165,7 +157,7 @@ function DetailView({id}:IProps){
   	}, [pathname]);
 	
 	const backClick = ()=>{
-		detailMovieHistory.go(-1);
+		history.go(-1);
 	};
 	
 	return (
@@ -174,26 +166,23 @@ function DetailView({id}:IProps){
 				<BackSvg onClick={backClick} xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 384 512">
 					<path d="M376.6 84.5c11.3-13.6 9.5-33.8-4.1-45.1s-33.8-9.5-45.1 4.1L192 206 56.6 43.5C45.3 29.9 25.1 28.1 11.5 39.4S-3.9 70.9 7.4 84.5L150.3 256 7.4 427.5c-11.3 13.6-9.5 33.8 4.1 45.1s33.8 9.5 45.1-4.1L192 306 327.4 468.5c11.3 13.6 31.5 15.4 45.1 4.1s15.4-31.5 4.1-45.1L233.7 256 376.6 84.5z"/>
 				</BackSvg>
-				<PosterDiv bgPhoto={makeImagePath(detailMovieD?.backdrop_path || "")} />
+				<PosterDiv bgPhoto={makeImagePath(detailTvD?.backdrop_path || "")} />
 				<Info>
-					<MovieTitle>{detailMovieD?.title}</MovieTitle>
-					<Item>{`상영시간: ${detailMovieD?.runtime}분`}</Item>
-					<Item>{`출시일: ${detailMovieD?.release_date}`}</Item>
-					<Overview>{detailMovieD?.overview}</Overview>
-					<Link to={`/movie/${id}/play`}>
-						<Play onClick={playMovie}>재생하기</Play>
-					</Link>
+					<MovieTitle>{detailTvD?.name}</MovieTitle>
+					<Item>{`편당 방영시간: ${detailTvD?.episode_run_time}분`}</Item>
+					<Item>{`출시일: ${detailTvD?.first_air_date}`}</Item>
+					<Overview>{detailTvD?.overview}</Overview>
 				</Info>
 			</Top>
 			<Bottom>
 				<hr style={{width:"89%", float:"right"}}/>
-				<h1 style={{transform:"translate(0, -40%)", fontSize:"40px", fontWeight:"600", paddingLeft:"1%"}}>추천 영화</h1>
+				<h1 style={{transform:"translate(0, -40%)", fontSize:"40px", paddingLeft:"1%", fontWeight:"600"}}>추천 채널</h1>
 				<Recommend>
-					{recommendD?.results.slice(0,48)
+					{recommendTvD?.results.slice(0,48)
 						.map((item)=>
 							<RecommendMovie 
 								key={item.id}
-								onClick={()=>recommendClick("movie",item.id)}
+								onClick={()=>recommendTvClick("movie",item.id)}
 								variants={recommendVariant}
 								whileHover="hover"
 								src={makeImagePath(item.poster_path || "")}
@@ -204,7 +193,7 @@ function DetailView({id}:IProps){
 	)
 }
 
-export default DetailView;
+export default DetailTvView;
 export {Play};
 export {BackSvg};
 //연관 영화 api 필요한 거 영화 id key
