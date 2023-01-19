@@ -101,7 +101,7 @@ function Tv() {
 		detailTvHistory.push("/tv");
 	};
 	const playMainMovie = ()=>{
-		detailTvHistory.push(`/tv/${gradeTv?.results[6].id}`);
+		detailTvHistory.push(`/tv/${gradeTv?.results[7].id}`);
 	};
 	
 	return (
